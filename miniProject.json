@@ -1,0 +1,188 @@
+{
+  "AWSTemplateFormatVersion":"2010-09-09",
+  "Description":"Stelligent Mini Project",
+  "Parameters":{
+    "s3Bucket":{
+      "Description":"Name of s3 bucket with Dockerfile and app.py",
+      "Type":"String"
+    }
+  },
+  "Mappings":{
+    "AmzLinuxAmi":{
+      "us-east-1":{
+        "AMI":"ami-0080e4c5bc078760e"
+      },
+      "us-east-2":{
+        "AMI":"ami-0cd3dfa4e37921605"
+      },
+      "us-west-1":{
+        "AMI":"ami-0ec6517f6edbf8044"
+      }
+    }
+  },
+  "Resources":{
+    "VPC":{
+      "Type":"AWS::EC2::VPC",
+      "Properties":{  
+        "CidrBlock":"10.0.0.0/16",
+        "Tags":[{"Key":"app", "Value":"flaskapp"}]
+      }
+    },
+    "Subnet":{
+      "Type":"AWS::EC2::Subnet",
+      "Properties":{
+        "VpcId":{"Ref":"VPC"},
+        "CidrBlock":"10.0.0.0/24",
+        "Tags":[{"Key":"app", "Value":"flaskapp"}]
+      }
+    },
+    "InternetGateway":{
+      "Type":"AWS::EC2::InternetGateway",
+      "Properties":{
+        "Tags":[{"Key":"app", "Value":"flaskapp"}]
+      }
+    },
+    "AttachGateway":{
+      "Type":"AWS::EC2::VPCGatewayAttachment",
+      "Properties":{
+        "VpcId":{"Ref":"VPC"},
+        "InternetGatewayId":{"Ref":"InternetGateway"}
+      }
+    },
+    "RouteTable":{
+      "Type":"AWS::EC2::RouteTable",
+      "Properties":{
+        "VpcId":{"Ref":"VPC"},
+        "Tags":[{"Key":"app", "Value":"flaskapp"}]
+      }
+    },
+    "Route":{
+      "Type":"AWS::EC2::Route",
+      "DependsOn":"AttachGateway",
+      "Properties":{
+        "RouteTableId":{"Ref":"RouteTable"},
+        "DestinationCidrBlock":"0.0.0.0/0",
+        "GatewayId":{"Ref":"InternetGateway"}
+      }
+    },
+    "SubnetRouteTableAssociation":{
+      "Type":"AWS::EC2::SubnetRouteTableAssociation",
+      "Properties":{
+        "SubnetId":{"Ref":"Subnet"},
+        "RouteTableId":{"Ref":"RouteTable"}
+      }
+    },
+    "IPAddress":{
+      "Type":"AWS::EC2::EIP",
+      "DependsOn":"AttachGateway",
+      "Properties":{
+        "Domain":"vpc",
+        "InstanceId":{"Ref":"FlaskInstance"}
+      }
+    },
+    "InstanceSecurityGroup":{
+      "Type":"AWS::EC2::SecurityGroup",
+      "Properties":{
+        "VpcId":{"Ref":"VPC"},
+        "GroupDescription":"Enable access to flask app via port 5000",
+        "SecurityGroupIngress":[
+          {"IpProtocol":"tcp", "FromPort":"5000", "ToPort":"5000", "CidrIp":"0.0.0.0/0"}
+        ],
+        "SecurityGroupEgress":[
+          {"IpProtocol":"-1", "CidrIp":"0.0.0.0/0"}
+        ]
+      }
+    },
+    "IamRole":{
+      "Type":"AWS::IAM::Role",
+      "Properties":{
+        "AssumeRolePolicyDocument":{
+          "Version":"2012-10-17",
+          "Statement":[
+            {
+              "Effect":"Allow",
+              "Principal":{
+                "Service":["ec2.amazonaws.com"]
+              },
+              "Action":["sts:AssumeRole"]
+            }
+          ]
+        },
+        "Path":"/"
+      }
+    },
+    "IamPolicy":{
+      "Type":"AWS::IAM::Policy",
+      "Properties":{
+        "PolicyName":"bucketAccess",
+        "PolicyDocument":{
+          "Version":"2012-10-17",
+          "Statement":[
+            {
+              "Effect":"Allow",
+              "Action":["s3:GetObject"],
+              "Resource":{
+                "Fn::Join":["",["arn:aws:s3:::",{"Ref":"s3Bucket"},"/*"]]
+              }
+            }
+          ]
+        },
+        "Roles":[{"Ref":"IamRole"}]
+      }
+    },
+    "IamInstanceProfile":{
+      "Type":"AWS::IAM::InstanceProfile",
+      "DependsOn":"IamRole",
+      "Properties":{
+        "Path":"/",
+        "Roles":[{"Ref":"IamRole"}]
+      }
+    },
+    "FlaskInstance":{
+      "Type":"AWS::EC2::Instance",
+      "DependsOn":"AttachGateway",
+      "Metadata":{
+        "Comment":"Installs Docker, pulls image, builds and runs container"
+      },
+      "Properties":{
+        "ImageId":{
+          "Fn::FindInMap":["AmzLinuxAmi",{"Ref":"AWS::Region"},"AMI"]
+        },
+        "InstanceType":"t2.micro",
+        "IamInstanceProfile":{"Ref":"IamInstanceProfile"},
+        "Tags":[{"Key":"app","Value":"flaskapp"}],
+        "NetworkInterfaces":[
+          {
+            "GroupSet":[{"Ref":"InstanceSecurityGroup"}],
+            "AssociatePublicIpAddress":"true",
+            "DeviceIndex":"0",
+            "DeleteOnTermination":"true",
+            "SubnetId":{"Ref":"Subnet"}
+          }
+        ],
+        "UserData":{
+          "Fn::Base64":{
+            "Fn::Join":["",[
+                "#!/bin/bash -xe\n",
+                "yum update -y\n",
+                "yum install docker -y\n",
+                "service docker start\n",
+                "chkconfig docker on\n",
+                "aws s3 cp s3://", {"Ref":"s3Bucket"}, "/Dockerfile /tmp/\n",
+                "aws s3 cp s3://", {"Ref":"s3Bucket"}, "/app.py /tmp/\n",
+                "docker build -t flaskapp /tmp/\n",
+                "docker run -d -p 5000:5000 flaskapp\n"]]}}
+      }
+    }
+  },
+  "Outputs":{
+    "PubIp":{
+      "Value":{"Ref":"IPAddress"},
+      "Description":"Public IP of flask app host"
+    },
+    "InstanceId":{
+      "Value":{"Ref":"FlaskInstance"},
+      "Description":"Instance ID of flask app host"
+    }
+  }
+}
