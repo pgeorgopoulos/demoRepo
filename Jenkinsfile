@@ -1,21 +1,21 @@
 pipeline {
   agent any
   stages {
-    stage('Commit') {
+    stage('Commit - Dev') {
       steps {
         sh '''#!/bin/bash -xe
 
 echo $APPENV'''
       }
     }
-    stage('Acceptance') {
+    stage('Acceptance - Dev') {
       steps {
         sh '''#!/bin/bash -xe
 
 echo $BUILD_ID'''
       }
     }
-    stage('Performance') {
+    stage('Performance - Dev') {
       steps {
         sh '''#!/bin/bash -xe
 
@@ -24,12 +24,37 @@ APPENV=prod
 echo $APPENV'''
       }
     }
-    stage('Promote') {
+    stage('Promote - Dev') {
       steps {
         sh '''#!/bin/bash -xe
 
 echo "Promoting"'''
         archiveArtifacts '*'
+      }
+    }
+    stage('Approval') {
+      steps {
+        input 'Approve Production Deployment'
+      }
+    }
+    stage('Commit - Prod') {
+      steps {
+        sh 'echo "Mommy"'
+      }
+    }
+    stage('Acceptance - Prod') {
+      steps {
+        sh 'echo "Daddy"'
+      }
+    }
+    stage('Performance - Prod') {
+      steps {
+        sh 'echo "France"'
+      }
+    }
+    stage('Promote - Prod') {
+      steps {
+        sh 'echo "I wouldn\'t go to..."'
       }
     }
   }
