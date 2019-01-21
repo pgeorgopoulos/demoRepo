@@ -13,6 +13,10 @@ echo $APPENV'''
         stage('test') {
           steps {
             input 'Must interact'
+            sh '''#!/bin/bash -xe
+
+echo $BUILD_ID
+echo $DATE'''
           }
         }
         stage('test2') {
