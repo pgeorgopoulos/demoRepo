@@ -20,7 +20,7 @@ echo $BUILD_ID'''
         sh '''#!/bin/bash -xe
 
 echo "Testing load"
-export APPENV=prod
+APPENV=prod
 echo $APPENV'''
       }
     }
