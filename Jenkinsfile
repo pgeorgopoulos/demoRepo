@@ -12,7 +12,7 @@ echo $APPENV'''
       steps {
         sh '''#!/bin/bash -xe
 
-echo "Bravo2"'''
+echo $BUILD_ID'''
       }
     }
     stage('Performance') {
