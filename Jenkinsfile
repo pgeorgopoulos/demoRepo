@@ -5,7 +5,7 @@ pipeline {
       steps {
         sh '''#!/bin/bash -xe
 
-echo "Testing"'''
+echo ${APPENV}'''
       }
     }
     stage('Acceptance') {
