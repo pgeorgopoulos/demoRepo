@@ -3,10 +3,8 @@ pipeline {
   stages {
     stage('Commit - Dev') {
       steps {
-        sh '''#!/bin/bash -xe
-
-echo $APPENV
-cat ./trigger.txt'''
+        sh '''echo $APPENV
+sh run.sh'''
       }
     }
     stage('Acceptance - Dev') {
