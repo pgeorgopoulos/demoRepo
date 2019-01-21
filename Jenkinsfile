@@ -1,5 +1,9 @@
 pipeline {
   agent any
+  environment {
+        APPENV  = 'dev'
+        PROFILE = 'deveast'
+    }
   stages {
     stage('Commit') {
       parallel {
