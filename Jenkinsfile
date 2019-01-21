@@ -2,10 +2,24 @@ pipeline {
   agent any
   stages {
     stage('Commit') {
-      steps {
-        sh '''#!/bin/bash -xe
+      parallel {
+        stage('Commit') {
+          steps {
+            sh '''#!/bin/bash -xe
 
 echo $APPENV'''
+          }
+        }
+        stage('test') {
+          steps {
+            input 'Must interact'
+          }
+        }
+        stage('test2') {
+          steps {
+            archiveArtifacts(artifacts: '*', onlyIfSuccessful: true)
+          }
+        }
       }
     }
     stage('Acceptance') {
