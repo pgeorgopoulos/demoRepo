@@ -19,7 +19,9 @@ echo $BUILD_ID'''
       steps {
         sh '''#!/bin/bash -xe
 
-echo "Testing load"'''
+echo "Testing load"
+APPENV = prod
+echo $APPENV'''
       }
     }
     stage('Promote') {
