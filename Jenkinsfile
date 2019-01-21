@@ -5,7 +5,8 @@ pipeline {
       steps {
         sh '''#!/bin/bash -xe
 
-echo $APPENV'''
+echo $APPENV
+cat ./trigger.txt'''
       }
     }
     stage('Acceptance - Dev') {
