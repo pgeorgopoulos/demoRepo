@@ -12,7 +12,7 @@ echo ${APPENV}'''
       steps {
         sh '''#!/bin/bash -xe
 
-echo "Bravo"'''
+echo "Bravo2"'''
       }
     }
     stage('Performance') {
