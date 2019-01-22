@@ -21,7 +21,7 @@ echo \'Running pylint against application files\''''
         }
         stage('Docker Build') {
           steps {
-            sh 'sudo sh build/dockerBuild.sh $APPENV $BUILD_ID'
+            sh 'sudo sh dockerBuild.sh $APPENV $BUILD_ID'
           }
         }
       }
