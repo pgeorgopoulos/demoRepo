@@ -1,4 +1,4 @@
 import tests
 
 
-tests.test_app_file
+tests.test_app_file()
