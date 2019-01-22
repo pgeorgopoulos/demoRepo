@@ -8,7 +8,7 @@ args = parser.parse_args()
 build_id = str(args.BUILD_ID).lower()
 
 
-cf = boto3.client('cloudformation')
+cf = boto3.client('cloudformation', aws_region='us-east-2')
 response = cf.describe_stacks(StackName='demoStack' + build_id)
 new_ip = response['Stacks'][0]['Outputs'][1]['OutputValue']
 
