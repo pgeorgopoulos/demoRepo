@@ -9,7 +9,7 @@ def test_app_file():
     with app.test_client() as c:
         rv = c.get('/')
         json_data = rv.get_json()
-        assert json_data["message"] == "I always test my code in " + appenv, 'message output not correct'
+        assert json_data["message"] == "I never liked " + appenv, 'message output not correct'
         now = time.time()
         assert json_data["timestamp"] <= now, 'timestamp shows future time'
         assert isinstance(json_data["timestamp"], int), 'timestamp not in correct integer format'
@@ -19,7 +19,7 @@ def test_app(ipaddr):
         r = requests.get('http://' + ipaddr + ':5000/')
         assert r.status_code == 200, 'status_code not 200'
         json_data = r.json()
-        assert json_data["message"] == "I always test my code in " + appenv, 'message output not correct'
+        assert json_data["message"] == "I never liked " + appenv, 'message output not correct'
         now = time.time()
         assert json_data["timestamp"] <= now, 'timestamp shows future time'
         assert isinstance(json_data["timestamp"], int), 'timestamp not in correct integer format'
