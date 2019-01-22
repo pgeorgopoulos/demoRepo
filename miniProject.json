@@ -122,8 +122,7 @@
                 "yum install docker -y\n",
                 "service docker start\n",
                 "chkconfig docker on\n",
-                "docker build -t amneok/flaskapp:v", {"Ref": "buildv"},"/tmp/\n",
-                "docker run -d -p 5000:5000 amneok/flaskapp:v", {"Ref": "buildv"}, "\n"]]}}
+                "docker run -d -p 5000:5000 amneok/flaskapp3:v", {"Ref": "buildv"}, "\n"]]}}
       }
     }
   },
