@@ -2,8 +2,8 @@
   "AWSTemplateFormatVersion":"2010-09-09",
   "Description":"Stelligent Mini Project",
   "Parameters":{
-    "BUILD_ID":{
-      "Description":"BUILD_ID from Jenkins",
+    "buildv":{
+      "Description":"buildv from Jenkins",
       "Type":"String"
     }
   },
@@ -25,7 +25,7 @@
       "Type":"AWS::EC2::VPC",
       "Properties":{  
         "CidrBlock":"10.0.0.0/16",
-        "Tags":[{"Key":"build", "Value":{"Ref": "BUILD_ID"}}]
+        "Tags":[{"Key":"build", "Value":{"Ref": "buildv"}}]
       }
     },
     "Subnet":{
@@ -33,13 +33,13 @@
       "Properties":{
         "VpcId":{"Ref":"VPC"},
         "CidrBlock":"10.0.0.0/24",
-        "Tags":[{"Key":"build", "Value":{"Ref": "BUILD_ID"}}]
+        "Tags":[{"Key":"build", "Value":{"Ref": "buildv"}}]
       }
     },
     "InternetGateway":{
       "Type":"AWS::EC2::InternetGateway",
       "Properties":{
-        "Tags":[{"Key":"build", "Value":{"Ref": "BUILD_ID"}}]
+        "Tags":[{"Key":"build", "Value":{"Ref": "buildv"}}]
       }
     },
     "AttachGateway":{
@@ -53,7 +53,7 @@
       "Type":"AWS::EC2::RouteTable",
       "Properties":{
         "VpcId":{"Ref":"VPC"},
-        "Tags":[{"Key":"build", "Value":{"Ref": "BUILD_ID"}}]
+        "Tags":[{"Key":"build", "Value":{"Ref": "buildv"}}]
       }
     },
     "Route":{
@@ -104,7 +104,7 @@
           "Fn::FindInMap":["AmzLinuxAmi",{"Ref":"AWS::Region"},"AMI"]
         },
         "InstanceType":"t2.micro",
-        "Tags":[{"Key":"build", "Value":{"Ref": "BUILD_ID"}}],
+        "Tags":[{"Key":"build", "Value":{"Ref": "buildv"}}],
         "NetworkInterfaces":[
           {
             "GroupSet":[{"Ref":"InstanceSecurityGroup"}],
@@ -122,8 +122,8 @@
                 "yum install docker -y\n",
                 "service docker start\n",
                 "chkconfig docker on\n",
-                "docker build -t amneok/flaskapp:v", {"Ref": "BUILD_ID"},"/tmp/\n",
-                "docker run -d -p 5000:5000 amneok/flaskapp:v", {"Ref": "BUILD_ID"}, "\n"]]}}
+                "docker build -t amneok/flaskapp:v", {"Ref": "buildv"},"/tmp/\n",
+                "docker run -d -p 5000:5000 amneok/flaskapp:v", {"Ref": "buildv"}, "\n"]]}}
       }
     }
   },

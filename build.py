@@ -35,7 +35,7 @@ def create_stack(template):
     response = cf.create_stack(
         StackName=stack_name,
         TemplateURL='https://s3.us-east-2.amazonaws.com/theplacewiththefiles/' + template, 
-        Parameters=[{'ParameterKey': 'BUILD_ID', 'ParameterValue': build_id}],
+        Parameters=[{'ParameterKey': 'buildv', 'ParameterValue': "v" + build_id}],
         Capabilities=['CAPABILITY_IAM'],
         Tags=[{'Key': 'build', 'Value': "v" + build_id}]
     )
