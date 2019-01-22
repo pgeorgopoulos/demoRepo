@@ -27,21 +27,44 @@ echo \'Running pylint against application files\''''
       }
     }
     stage('Acceptance') {
-      steps {
-        sh '''sudo python build.py --BUILD_ID $BUILD_ID --stack_name demoStack$BUILD_ID
+      parallel {
+        stage('Acceptance') {
+          steps {
+            sh 'echo \'ACCEPTANCE HERE I COME!\''
+          }
+        }
+        stage('Build Environment, Function Test, & Security Scan') {
+          steps {
+            sh '''sudo python build.py --BUILD_ID $BUILD_ID --stack_name demoStack$BUILD_ID
 
 echo \'Here I would run function tests\'
 
 echo \'Here I would run a security scan\''''
+          }
+        }
       }
     }
     stage('Performance') {
-      steps {
-        sh 'echo \'This is where I would generate the load.\''
+      parallel {
+        stage('Performance') {
+          steps {
+            sh 'echo \'Performance testing is happening!\''
+          }
+        }
+        stage('Load Tests') {
+          steps {
+            sh 'echo \'This is where I would generate the load.\''
+          }
+        }
       }
     }
     stage('Promote') {
       parallel {
+        stage('Promote') {
+          steps {
+            sh 'echo \'The Captain becomes The Major\''
+          }
+        }
         stage('Route Traffic') {
           steps {
             sh '''echo \'Would do this with an ELB normally but...\'
