@@ -5,7 +5,7 @@ pipeline {
       parallel {
         stage('Commit') {
           steps {
-            sh 'echo "COMMIT STAGE COMMENCING"'
+            sh 'echo "COMMIT STAGE HERE WE GO!"'
           }
         }
         stage('Syntax Checks') {
