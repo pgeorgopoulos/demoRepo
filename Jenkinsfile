@@ -11,7 +11,7 @@ pipeline {
         stage('Syntax Checks') {
           steps {
             sh '''echo \'Running cnf_nag_scan against CFT\'
-echo \'Running pylint against application files\''''
+echo \'Running pylint against application files"'''
           }
         }
         stage('Unit testing') {
@@ -67,7 +67,9 @@ echo \'Here I would run a security scan\''''
         }
         stage('Route Traffic') {
           steps {
-            sh '''echo \'Find elb from janicejoplin$BUILD_ID output and change Route53 record.\'
+            sh '''echo \'Would do this with an ELB normally but...\'
+
+sudo python route53.py --BUILD_ID $BUILD_ID
 
 echo \'This is where I would tear down the old environment\''''
           }
