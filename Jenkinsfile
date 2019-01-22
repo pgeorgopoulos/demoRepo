@@ -11,7 +11,7 @@ pipeline {
         stage('Syntax Checks') {
           steps {
             sh '''echo \'Running cnf_nag_scan against CFT\'
-echo \'Running pylint against application files"'''
+echo \'Running pylint against application files\''''
           }
         }
         stage('Unit testing') {
