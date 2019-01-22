@@ -3,18 +3,18 @@ pipeline {
   stages {
     stage('Commit') {
       steps {
-        sh '$APPENV'
+        sh 'echo $APPENV'
       }
     }
     stage('Acceptance') {
       steps {
         sh '''APPENV=prod
-$APPENV'''
+echo $APPENV'''
       }
     }
     stage('Performance') {
       steps {
-        sh '$APPENV'
+        sh 'echo $APPENV'
       }
     }
     stage('Promote') {
