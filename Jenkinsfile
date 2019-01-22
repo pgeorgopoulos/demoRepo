@@ -5,7 +5,7 @@ pipeline {
       parallel {
         stage('Commit') {
           steps {
-            sh 'echo "COMMIT STAGE HERE WE GO!"'
+            echo 'Commit stage is happening!'
           }
         }
         stage('Syntax Checks') {
@@ -30,7 +30,7 @@ echo \'Running pylint against application files\''''
       parallel {
         stage('Acceptance') {
           steps {
-            sh 'echo \'ACCEPTANCE HERE I COME!\''
+            echo 'Building and testing environment.'
           }
         }
         stage('Build Environment, Function Test, & Security Scan') {
@@ -48,12 +48,13 @@ echo \'Here I would run a security scan\''''
       parallel {
         stage('Performance') {
           steps {
-            sh 'echo \'Performance testing is happening!\''
+            echo 'Performance testing is happening!'
           }
         }
         stage('Load Tests') {
           steps {
             sh 'echo \'This is where I would generate the load.\''
+            sleep 2
           }
         }
       }
@@ -62,7 +63,7 @@ echo \'Here I would run a security scan\''''
       parallel {
         stage('Promote') {
           steps {
-            sh 'echo \'The Captain becomes The Major\''
+            echo 'Promoting'
           }
         }
         stage('Route Traffic') {
