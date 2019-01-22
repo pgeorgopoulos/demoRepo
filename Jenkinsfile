@@ -82,6 +82,5 @@ echo \'This is where I would tear down the old environment\''''
   }
   environment {
     APPENV = 'prod'
-    PROFILE = 'prodeast'
   }
 }
