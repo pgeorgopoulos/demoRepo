@@ -5,7 +5,7 @@ pipeline {
       parallel {
         stage('Commit') {
           steps {
-            sh 'echo "COMMIT STAGE COMMENCING"'
+            sh 'echo "COMMIT STAGE COMMENCING\''
           }
         }
         stage('Syntax Checks') {
@@ -54,7 +54,7 @@ echo \'Running pylint against application files\''''
       parallel {
         stage('Performance') {
           steps {
-            sh 'echo \'Performance testing... it\'s happening!\''
+            sh 'echo \'Performance testing is happening!\''
           }
         }
         stage('Load Tests') {
