@@ -1,7 +1,9 @@
 import time
 import requests
 from app import app
+import os
 
+appenv = os.getenv('APPENV')
 
 def test_app_file():
     with app.test_client() as c:
