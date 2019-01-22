@@ -5,7 +5,7 @@ pipeline {
       parallel {
         stage('Commit') {
           steps {
-            sh 'echo "COMMIT STAGE COMMENCING"'
+            sh 'echo "COMMIT STAGE COMMENCING\''
           }
         }
         stage('Syntax Checks') {
@@ -35,7 +35,7 @@ echo \'Running pylint against application files\''''
         }
         stage('Build Environment') {
           steps {
-            sh 'sudo python build.py --s3_bucket_name janicejoplin$BUILD_ID --stack_name janicejoplin$BUILD_ID'
+            sh 'sudo python build.py --BUILD_ID $BUILD_ID --stack_name demoStack$BUILD_ID'
           }
         }
         stage('Function Tests') {
@@ -54,7 +54,7 @@ echo \'Running pylint against application files\''''
       parallel {
         stage('Performance') {
           steps {
-            sh 'echo \'Performance testing... it\'s happening!\''
+            sh 'echo \'Performance testing is happening!\''
           }
         }
         stage('Load Tests') {
