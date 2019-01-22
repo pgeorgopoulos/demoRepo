@@ -10,7 +10,8 @@ def ts():
 
 @app.route("/")
 def mini_project():
-    resp = jsonify({"message": "Automation for the People", "timestamp": ts()})
+    appenv = os.getenv('APPENV')
+    resp = jsonify({"message": "I looooove to code in " + appenv, "timestamp": ts()})
     resp.headers["X-Frame-Options"] = "SAMEORIGIN"
     resp.headers["X-XSS-Protection"] = "1; mode=block"
     resp.headers["X-Content-Type-Options"] = "nosniff"
