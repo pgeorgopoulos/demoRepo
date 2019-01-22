@@ -36,10 +36,10 @@ python unitTest.py'''
         }
         stage('Build Environment, Function Test, & Security Scan') {
           steps {
-            sh '''sudo python build.py --BUILD_ID $BUILD_ID --stack_name demoStack$BUILD_ID
+            sh '''python build.py --BUILD_ID $BUILD_ID --stack_name demoStack$BUILD_ID
 
 echo \'Here I would run function tests\'
-sudo python functionTest.py --BUILD_ID $BUILD_ID
+python functionTest.py --BUILD_ID $BUILD_ID
 
 echo \'Here I would run a security scan\''''
           }
@@ -72,7 +72,7 @@ echo \'Here I would run a security scan\''''
           steps {
             sh '''echo \'Would do this with an ELB normally but...\'
 
-sudo python route53.py --BUILD_ID $BUILD_ID
+python route53.py --BUILD_ID $BUILD_ID
 
 echo \'This is where I would tear down the old environment\''''
           }
