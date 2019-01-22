@@ -22,7 +22,7 @@ python unitTest.py'''
         }
         stage('Docker Build') {
           steps {
-            sh 'sh dockerBuild.sh $APPENV $BUILD_ID'
+            sh 'sudo sh dockerBuild.sh $APPENV $BUILD_ID'
           }
         }
       }
