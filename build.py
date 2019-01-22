@@ -7,18 +7,17 @@ import tests
 
 parser = argparse.ArgumentParser(description='Build and cleanup script for Stelligent mini project')
 group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument('--s3_bucket_name', help="A globally unique s3 bucket name. This argument cannot be used with the --decomm argument.")
+group.add_argument('--BUILD_ID', help="BUILD_ID")
 parser.add_argument('--region', choices=["us-east-1", "us-east-2", "us-west-1"], help="AWS region", default="us-east-2", required=False)
 parser.add_argument('--stack_name', help="A CloudFormation stack name unique to the AWS account and region this build is running against.", required=True)
 group.add_argument('--decomm', action='store_true', help="Tear down everything built by this script. This argument cannot be used with the --s3_bucket_name argument.")
 args = parser.parse_args()
 
-bucket_name = str(args.s3_bucket_name).lower()
+build_id = str(args.BUILD_ID).lower()
 region = str(args.region).lower()
 stack_name = str(args.stack_name)
 decomm = bool(args.decomm)
 current_dir = os.path.dirname(os.path.realpath(__file__))
-files_to_upload = ['app.py', 'Dockerfile', 'miniProject.json']
 bad_states = [
 	'CREATE_FAILED',
 	'ROLLBACK_IN_PROGRESS',
@@ -30,64 +29,15 @@ sock = socket.socket()
 
 
 ####### FUCNTIONS #######
-def make_bucket(bname):
-    if region == 'us-east-1':
-        s3 = boto3.client('s3')
-        response = s3.create_bucket(
-            ACL='private',
-            Bucket=bname
-        )
-    else:
-        s3 = boto3.client('s3')
-        response = s3.create_bucket(
-            ACL='private',
-            Bucket=bname,
-            CreateBucketConfiguration={
-                'LocationConstraint': region
-            }
-        )
-    return response
-
-def delete_file(bname, key):
-    s3 = boto3.client('s3')
-    response = s3.delete_objects(
-        Bucket=bname,
-        Delete={'Objects': [{'Key': key}]}
-    )
-    return response
-
-def delete_bucket(bname):
-    s3 = boto3.client('s3')
-    response = s3.delete_bucket(Bucket=bname)
-    return response
-
-def upload_file(file_name):
-    s3 = boto3.client('s3')
-    response = s3.upload_file(current_dir + '/' + file_name, bucket_name, file_name)
-    return response
-
-def cleanup_s3():
-    print('Cleaning up s3 bucket ' + bucket_name + '...')
-    for file in files_to_upload:
-        delete_file(bucket_name, file)
-    delete_bucket(bucket_name)
-    return True
-
-def validate_template(template):
-    cf = boto3.client('cloudformation', region_name = region)
-    response = cf.validate_template(
-        TemplateURL='https://s3.' + region + '.amazonaws.com/' + bucket_name + '/' + template 
-    )
-    return response
 
 def create_stack(template):
     cf = boto3.client('cloudformation', region_name = region)
     response = cf.create_stack(
         StackName=stack_name,
-        TemplateURL='https://s3.' + region + '.amazonaws.com/' + bucket_name + '/' + template, 
-        Parameters=[{'ParameterKey': 's3Bucket', 'ParameterValue': bucket_name}],
+        TemplateURL='https://s3.us-east-2.amazonaws.com/theplacewiththefiles/' + template, 
+        Parameters=[{'ParameterKey': 'BUILD_ID', 'ParameterValue': build_id}],
         Capabilities=['CAPABILITY_IAM'],
-        Tags=[{'Key': 'app', 'Value': 'flaskapp'}]
+        Tags=[{'Key': 'build', 'Value': build_id}]
     )
     return response
 
@@ -149,45 +99,21 @@ if decomm:
     
     exit(0)
 else:
-    print('Testing app.py to ensure app functionality is correct...')
-    tests.test_app_file()
-
-    print('Making s3 bucket named ' + bucket_name + '...')
-    make_bucket(bucket_name)
-
-    for file in files_to_upload:
-        print('Uploading ' + file + ' to ' + bucket_name + '...')
-        upload_file(file)
-
-    print('Validating CloudFormation template syntax...')
-    try:
-        validate_template('miniProject.json')
-    except Exception as e:
-        print(e)
-        print('Try running this utility again once the decomm process is complete.')
-        cleanup_s3()
-        print('Exiting build.')
-        exit(1)
-    except:
-        print('Unexpected error!')
-        print('Try running this utility again once the decomm process is complete.')
-        cleanup_s3()
-        print('Exiting build.')
-        exit(1)
-
     print('Creating CloudFormation stack: ' + stack_name + '...')
     try:
         create_stack('miniProject.json')
     except Exception as e:
         print(e)
         print('Try running this utility again once the decomm process is complete.')
-        cleanup_s3()
+        stack_id = get_stack_id(stack_name)
+        delete_build()
         print('Exiting build.')
         exit(1)
     except:
         print('Unexpected error!')
         print('Try running this utility again once the decomm process is complete.')
-        cleanup_s3()
+        stack_id = get_stack_id(stack_name)
+        delete_build()
         print('Exiting build.')
         exit(1)
 
@@ -200,7 +126,6 @@ else:
         if stack_status in bad_states:
             print('CloudFormation stack in ' + stack_status + ' state...' )
             print('Try running this utility again once the decomm process is complete.')
-            cleanup_s3()
             delete_build()
             print('Exiting build.')
             exit(1)
@@ -220,7 +145,6 @@ else:
             if (instance_status == 'impaired') or (system_status == 'failed') or (i >= 10):
                 print('There is something wrong with the app instance.')
                 print('Try running this utility again once the decomm process is complete.')
-                cleanup_s3()
                 delete_build()
                 print('Exiting build.')
                 exit(1)
@@ -229,14 +153,12 @@ else:
     except IndexError as e:
         print('Instance or system status was unreadable.')
         print('Try running this utility again once the decomm process is complete.')
-        cleanup_s3()
         delete_build()
         print('Exiting build.')
         exit(1)
     except:
         print('Unexpected error!')
         print('Try running this utility again once the decomm process is complete.')
-        cleanup_s3()
         delete_build()
         print('Exiting build.')
         exit(1)
@@ -255,34 +177,10 @@ else:
             if x >= 20:
                 print('The app server has taken too long to become available. Something is wrong...')
                 print('Try running this utility again once the decomm process is complete.')
-                cleanup_s3()
                 delete_build()
                 print('Exiting build.')
                 exit(1)
             time.sleep(5)
-
-    print('s3 bucket no longer needed...')
-    cleanup_s3()
-    
-    print('Running tests against newly built app to ensure proper functionality...')
-    try:
-        tests.test_app(public_ip)
-    except AssertionError as e:
-        print('Assertion in test FAILED!')
-        print(e)
-        print('Try running this utility again once the decomm process is complete.')
-        delete_build()
-        exit(1)
-    except Exception as e:
-        print(e)
-        print('Try running this utility again once the decomm process is complete.')
-        delete_build()
-        exit(1)
-    except:
-        print('Unexpected error!')
-        print('Try running this utility again once the decomm process is complete.')
-        delete_build()
-        exit(1)
 
     print('Build of miniProject complete! Connect to app: http://' + public_ip + ':5000/')
 
