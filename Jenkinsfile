@@ -10,18 +10,19 @@ pipeline {
         }
         stage('Syntax Checks') {
           steps {
-            sh '''echo \'Running cnf_nag_scan against CFT"
-echo \'Running pylint against application files"'''
+            sh '''echo \'Running cnf_nag_scan against CFT\'
+echo \'Running pylint against application files\''''
           }
         }
         stage('Unit testing') {
           steps {
-            sh 'echo \'Running unit tests"'
+            sh 'echo \'Running unit tests\''
           }
         }
         stage('Docker Build') {
           steps {
-            sh 'sh build/dockerBuild.sh'
+            sh '''sudo docker build .. --build-arg APPENV=$APPENV -t amneok/flaskapp3:v$BUILD_ID
+sudo docker push amneok/flaskapp3:v$BUILD_ID'''
           }
         }
       }
