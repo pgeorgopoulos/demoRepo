@@ -16,7 +16,8 @@ echo \'Running pylint against application files\''''
         }
         stage('Unit testing') {
           steps {
-            sh 'echo \'Running unit tests\''
+            sh '''echo \'Running unit tests\'
+python unitTest.py'''
           }
         }
         stage('Docker Build') {
@@ -38,6 +39,7 @@ echo \'Running pylint against application files\''''
             sh '''sudo python build.py --BUILD_ID $BUILD_ID --stack_name demoStack$BUILD_ID
 
 echo \'Here I would run function tests\'
+python functionTest.py --BUILD_ID $BUILD_ID
 
 echo \'Here I would run a security scan\''''
           }
