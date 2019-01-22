@@ -75,6 +75,7 @@ echo \'Here I would run a security scan\''''
 python route53.py --BUILD_ID $BUILD_ID
 
 echo \'This is where I would tear down the old environment\''''
+            sleep 10
           }
         }
         stage('Archive') {
