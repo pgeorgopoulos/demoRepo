@@ -33,19 +33,13 @@ echo \'Running pylint against application files\''''
             sh 'echo \'ACCEPTANCE HERE I COME!\''
           }
         }
-        stage('Build Environment') {
+        stage('Build Environment, Function Test, & Security Scan') {
           steps {
-            sh 'sudo python build.py --BUILD_ID $BUILD_ID --stack_name demoStack$BUILD_ID'
-          }
-        }
-        stage('Function Tests') {
-          steps {
-            sh 'echo \'Running function tests\''
-          }
-        }
-        stage('Security Scan') {
-          steps {
-            sh 'echo \'Use boto3 or aws cli to grab ELB url and scan\''
+            sh '''sudo python build.py --BUILD_ID $BUILD_ID --stack_name demoStack$BUILD_ID
+
+echo \'Here I would run function tests\'
+
+echo \'Here I would run a security scan\''''
           }
         }
       }
@@ -73,12 +67,9 @@ echo \'Running pylint against application files\''''
         }
         stage('Route Traffic') {
           steps {
-            sh 'echo \'Find elb from janicejoplin$BUILD_ID output and change Route53 record.\''
-          }
-        }
-        stage('Destroy Old Environment') {
-          steps {
-            sh 'echo \'Goodbye World!\''
+            sh '''echo \'Find elb from janicejoplin$BUILD_ID output and change Route53 record.\'
+
+echo \'This is where I would tear down the old environment\''''
           }
         }
         stage('Archive') {
