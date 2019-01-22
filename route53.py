@@ -12,6 +12,7 @@ cf = boto3.client('cloudformation')
 response = cf.describe_stacks(StackName='demoStack' + build_id)
 new_ip = response['Stacks'][0]['Outputs'][1]['OutputValue']
 
+
 r53 = boto3.client('route53')
 r53.change_resource_record_sets(
     HostedZoneId='Z3JLKIWI026135',
@@ -21,18 +22,14 @@ r53.change_resource_record_sets(
             {
                 'Action': 'UPSERT',
                 'ResourceRecordSet': {
-                    'Name': 'app',
+                    'Name': 'app.peter-g.net',
                     'Type': 'A',
+                    'TTL': 300,
                     'ResourceRecords': [
                         {
                             'Value': new_ip
-                        },
-                    ],
-                    'AliasTarget': {
-                        'HostedZoneId': 'Z3JLKIWI026135',
-                        'DNSName': 'app.peter-g.net.',
-                        'EvaluateTargetHealth': True
-                    }
+                        }
+                    ]
                 }
             },
         ]
