@@ -1,57 +1,23 @@
 pipeline {
   agent any
   stages {
-    stage('Commit - Dev') {
+    stage('Commit') {
       steps {
-        sh '''echo $APPENV
-sh run.sh'''
+        sh '$APPENV'
       }
     }
-    stage('Acceptance - Dev') {
+    stage('Acceptance') {
       steps {
-        sh '''#!/bin/bash -xe
-
-echo $BUILD_ID'''
+        sh '''APPENV=prod
+$APPENV'''
       }
     }
-    stage('Performance - Dev') {
+    stage('Performance') {
       steps {
-        sh '''#!/bin/bash -xe
-
-echo "Testing load"
-APPENV=prod
-echo $APPENV'''
+        sh '$APPENV'
       }
     }
-    stage('Promote - Dev') {
-      steps {
-        sh '''#!/bin/bash -xe
-
-echo "Promoting"'''
-        archiveArtifacts '*'
-      }
-    }
-    stage('Approval') {
-      steps {
-        input 'Approve Production Deployment'
-      }
-    }
-    stage('Commit - Prod') {
-      steps {
-        sh 'echo "Mommy"'
-      }
-    }
-    stage('Acceptance - Prod') {
-      steps {
-        sh 'echo "Daddy"'
-      }
-    }
-    stage('Performance - Prod') {
-      steps {
-        sh 'echo "France"'
-      }
-    }
-    stage('Promote - Prod') {
+    stage('Promote') {
       steps {
         sh 'echo "I wouldn\'t go to..."'
       }
