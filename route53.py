@@ -24,7 +24,7 @@ r53.change_resource_record_sets(
                 'ResourceRecordSet': {
                     'Name': 'app.peter-g.net',
                     'Type': 'A',
-                    'TTL': 300,
+                    'TTL': 0,
                     'ResourceRecords': [
                         {
                             'Value': new_ip
