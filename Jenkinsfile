@@ -35,7 +35,7 @@ echo \'Running pylint against application files\''''
         }
         stage('Build Environment') {
           steps {
-            sh 'sudo python build.py --s3_bucket_name janicejoplin$BUILD_ID --stack_name janicejoplin$BUILD_ID'
+            sh 'sudo python build.py --BUILD_ID $BUILD_ID --stack_name demoStack$BUILD_ID'
           }
         }
         stage('Function Tests') {
