@@ -39,7 +39,7 @@ python unitTest.py'''
             sh '''sudo python build.py --BUILD_ID $BUILD_ID --stack_name demoStack$BUILD_ID
 
 echo \'Here I would run function tests\'
-python functionTest.py --BUILD_ID $BUILD_ID
+sudo python functionTest.py --BUILD_ID $BUILD_ID
 
 echo \'Here I would run a security scan\''''
           }
