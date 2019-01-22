@@ -4,6 +4,10 @@ LABEL maintainer "Peter Georgopoulos <peter.g.georgopoulos@outlook.com>"
 
 WORKDIR /app
 
+ARG APPENV
+
+ENV APPENV=$APPENV
+
 RUN pip install flask
 
 COPY ./app.py .
