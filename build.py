@@ -37,7 +37,7 @@ def create_stack(template):
         TemplateURL='https://s3.us-east-2.amazonaws.com/theplacewiththefiles/' + template, 
         Parameters=[{'ParameterKey': 'BUILD_ID', 'ParameterValue': build_id}],
         Capabilities=['CAPABILITY_IAM'],
-        Tags=[{'Key': 'build', 'Value': build_id}]
+        Tags=[{'Key': 'build', 'Value': "v" + build_id}]
     )
     return response
 
