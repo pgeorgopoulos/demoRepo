@@ -21,7 +21,7 @@ echo \'Running pylint against application files\''''
         }
         stage('Docker Build') {
           steps {
-            sh 'sh build/dockerBuild.sh'
+            sh 'sudo sh build/dockerBuild.sh'
           }
         }
       }
