@@ -1,5 +1,6 @@
 import boto3
 import argparse
+import time
 
 
 parser = argparse.ArgumentParser(description='Input the IP I need')
@@ -39,6 +40,10 @@ r53.change_resource_record_sets(
         ]
     }
 )
+
+
+# time.sleep(15)
+
 
 # stack_list = cf.list_stacks(StackStatusFilter=['CREATE_COMPLETE'])
 # stack_sums = stack_list['StackSummaries']
