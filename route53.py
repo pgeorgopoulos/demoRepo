@@ -1,14 +1,18 @@
 import boto3
 import argparse
 
+
 parser = argparse.ArgumentParser(description='Input the IP I need')
 parser.add_argument('--BUILD_ID', required=True)
 args = parser.parse_args()
+
 
 build_id = str(args.BUILD_ID).lower()
 
 
 cf = boto3.client('cloudformation')
+
+
 response = cf.describe_stacks(StackName='demoStack' + build_id)
 new_ip = response['Stacks'][0]['Outputs'][1]['OutputValue']
 
@@ -35,3 +39,10 @@ r53.change_resource_record_sets(
         ]
     }
 )
+
+stack_list = cf.list_stacks(StackStatusFilter=['CREATE_COMPLETE'])
+stack_sums = stack_list['StackSummaries']
+for cfstack in stack_sums:
+    stack_name = cfstack['StackName']
+    if stack_name != 'demoStack' + build_id:
+        cf.delete_stack(StackName=stack_name)
