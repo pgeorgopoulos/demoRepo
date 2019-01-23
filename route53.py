@@ -40,9 +40,9 @@ r53.change_resource_record_sets(
     }
 )
 
-stack_list = cf.list_stacks(StackStatusFilter=['CREATE_COMPLETE'])
-stack_sums = stack_list['StackSummaries']
-for cfstack in stack_sums:
-    stack_name = cfstack['StackName']
-    if stack_name != 'demoStack' + build_id:
-        cf.delete_stack(StackName=stack_name)
+# stack_list = cf.list_stacks(StackStatusFilter=['CREATE_COMPLETE'])
+# stack_sums = stack_list['StackSummaries']
+# for cfstack in stack_sums:
+#     stack_name = cfstack['StackName']
+#     if stack_name != 'demoStack' + build_id:
+#         cf.delete_stack(StackName=stack_name)
